@@ -18,4 +18,5 @@ export class CloudinaryService {
     async destroyFile(publicId: string) {
         v2.uploader.destroy(publicId, (error, result) =>result)
     }
+    
 }
