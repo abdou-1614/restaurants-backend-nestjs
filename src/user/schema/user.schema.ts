@@ -22,6 +22,9 @@ export class User {
     avatar: string
 
     @Prop({ type: String})
+    avatarId: string
+
+    @Prop({ type: String})
     address: string
 
     @Prop({ type: String, minlength: 6, required: [true, 'Password Is Required']})
@@ -49,9 +52,9 @@ export class User {
     blockExpires: Date
 }
 
-export const UserModel = SchemaFactory.createForClass(User)
+export const UserSchema = SchemaFactory.createForClass(User)
 
-UserModel.pre('save', async function() {
+UserSchema.pre('save', async function() {
     const user = this as UserDocument
     if(!user.isModified('password')) {
         return
@@ -63,7 +66,7 @@ UserModel.pre('save', async function() {
     user.password = hashed
 })
 
-UserModel.methods.comparPassword = async function(condidatePassword: string) {
+UserSchema.methods.comparPassword = async function(condidatePassword: string) {
     try{
         const user = this as UserDocument
         return compare(condidatePassword, user.password)
