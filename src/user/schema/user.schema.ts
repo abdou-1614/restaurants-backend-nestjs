@@ -42,7 +42,7 @@ export class User {
     @Prop({ type: String, })
     verification: string
 
-    @Prop({ type: Date})
+    @Prop({ type: Date, default: Date.now()})
     verificationExpires: Date
 
     @Prop({ type: Number, default: 0})
