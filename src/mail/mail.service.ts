@@ -7,7 +7,7 @@ export class MailService {
     constructor(private mailerService: MailerService) {}
 
     async sendUserConfirmationEmail(user: UserDocument, token: string) {
-        const url = `${process.env.FRONT_END_URL}/confirm-email/${token}`
+        const url = `${process.env.FRONT_END_URL}/confirm-email/?token=${token}`
 
         await this.mailerService.sendMail({
             to: user.email,
