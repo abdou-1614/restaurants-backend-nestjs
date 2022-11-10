@@ -1,4 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import { hashSync } from 'bcrypt';
+import { CloudinaryService } from './../cloudinary/cloudinary.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { privateField, UserDocument } from './schema/user.schema';
+import { MailService } from 'src/mail/mail.service';
+import {v4 as uuidv4 } from 'uuid'
+import { addHours } from 'date-fns';
+import { omit } from 'lodash';
 
 @Injectable()
-export class UserService {}
+export class UserService {
+
+    HOURS_TO_VERIFY = 2
+    HOURS_TO_BLOCK = 6
+    LOGIN_ATTEMPTS_TO_BLOCK = 5
+
+    constructor(
+        @InjectModel('User') private readonly UserModel: Model<UserDocument>,
+        private readonly mailService: MailService,
+        private readonly cloudinary: CloudinaryService
+        ) {}
+
+    async createUser(input: CreateUserDto) {
+        const { fullName, email, password, address, avatar } = input
+        await this.isEmailTaken(email)
+        const data = uuidv4()
+
+        const image = await this.cloudinary.uploadFile(avatar)
+
+        const verification = hashSync(data, 10)
+
+        const verificationExpires = addHours(new Date(), this.HOURS_TO_VERIFY)
+        const user = await this.UserModel.create({
+            fullName,
+            email,
+            password,
+            verification,
+            address,
+            verificationExpires,
+            avatar: image.secure_url,
+            avatarId: image.public_id
+        })
+
+        await this.mailService.sendUserConfirmationEmail(user, verification)
+        return omit(user.toJSON(), privateField)
+
+    }
+
+
+    private async isEmailTaken(email: string) {
+        const user = await this.UserModel.findOne({email, verified: true})
+        if(user) throw new BadRequestException('Email Already Taken')
+    }
+}
