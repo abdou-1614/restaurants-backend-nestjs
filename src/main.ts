@@ -14,6 +14,7 @@ async function bootstrap() {
     whitelist: true,
     forbidNonWhitelisted: true
   }))
+  
 
   const config = new DocumentBuilder()
   .setTitle('Restaurants Backend')
