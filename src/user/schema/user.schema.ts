@@ -2,6 +2,16 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { compare, genSalt, hashSync } from "bcrypt";
 import mongoose from "mongoose";
 
+export const privateField = [
+    'password',
+    '__v',
+    'isActive',
+    'verification',
+    'verificationExpires',
+    'confirmationAttemptsCount',
+    'blockExpires'
+]
+
 export type UserDocument = User & mongoose.Document
 
 export enum Role {
