@@ -1,42 +1,36 @@
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
-import { diskStorage } from 'multer';
-import path from 'path';
+import { diskStorage, memoryStorage } from 'multer';
+import { extname } from 'path';
 
-export const validateImagesUploeadTypes = /png|jpg|jpeg/;
-
-export const maxUploadImageSize = 3 * 1024 * 1024; // ==> 3MB
-
-/**
- * Configuration Multer Library Used For File Upload
- * Accepts Only jpes, jpg and png of size up to 3MB
+/** Constant containing a Regular Expression
+ * with the valid image upload types
  */
+ export const validImageUploadTypes = /jpeg|jpg|png/;
 
-export const MulterConfig: MulterOptions = {
-  storage: diskStorage({
-    destination: '/tmp',
-    filename: (_, file, callback) => {
-      const uniqueSuffix = Date.now + '-' + Math.round(Math.random() * 1e9);
-      const fileName = `${uniqueSuffix}-${file.originalname}`;
-      return callback(null, fileName);
-    },
-  }),
-
-  fileFilter: (_, file, callback) => {
-    const mimeType = validateImagesUploeadTypes.test(file.mimetype);
-    const extname = validateImagesUploeadTypes.test(
-      path.extname(file.originalname).toLocaleLowerCase(),
-    );
-
-    if (mimeType && extname) return callback(null, true);
-    return callback(
-      new Error(
-        `File upload only supports the following filetypes ${validateImagesUploeadTypes}`,
-      ),
-      false,
-    );
-  },
-
-  limits: {
-    fileSize: maxUploadImageSize,
-  },
-};
+ /** Constant that sets the maximum image upload file size */
+ export const maxImageUploadSize = 3 * 1024 * 1024; // 3MB
+ 
+ /** Configurations for the multer library used for file upload.
+  *
+  * Accepts types jpeg, jpg and png of size up to 3MB
+  */
+ export const multerUploadConfig: MulterOptions = {
+   storage: memoryStorage(),
+ 
+   fileFilter: (_, file, callback) => {
+     const mimetype = validImageUploadTypes.test(file.mimetype);
+     const existtname = validImageUploadTypes.test(
+       extname(file.originalname).toLowerCase(),
+     );
+ 
+     if (mimetype && existtname) {
+       return callback(null, true);
+     }
+ 
+     return callback(new Error(`File Upload Support Only ${validImageUploadTypes}`), false);
+   },
+ 
+   limits: {
+     fileSize: maxImageUploadSize,
+   },
+ };
