@@ -2,7 +2,7 @@ import { NestInterceptor, Injectable, ExecutionContext, CallHandler } from '@nes
 import { Observable } from 'rxjs'
 
 @Injectable()
-export class FileUploadBoduInterceptor implements NestInterceptor {
+export class FileUploadBodyInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const ctx = context.switchToHttp()
         const req = ctx.getRequest()
