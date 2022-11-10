@@ -12,15 +12,14 @@ import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
                 transport: {
-                    host: configService.get<string>('MAIL_HOST'),
-                    port: configService.get<number>('MAIL_PORT'),
+                    host: 'smtp.sendgrid.net',
                     auth: {
-                        user: configService.get<string>('MAIL_USERNAME'),
-                        pass: configService.get<string>('MAIL_PASSWORD')
+                        user: 'apikey',
+                        pass: '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'
                     }
                 },
                 defaults: {
-                    from: `No Reply <${configService.get('MAIL_ADDRESS')}>`
+                    from: `No Reply kirakira@gmail.com`
                 },
                 template: {
                     dir: join(__dirname, 'templates'),
