@@ -21,6 +21,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     email:string
 
+    @IsNotEmpty()
     @ApiFile()
     avatar: Express.Multer.File
 
