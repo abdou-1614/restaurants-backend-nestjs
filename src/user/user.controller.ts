@@ -5,6 +5,7 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadBodyInterceptor } from 'src/common/interceptors/fileUpload.interceptor';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Param, Req } from '@nestjs/common/decorators';
 
 @ApiTags('Users')
 @Controller('user')
@@ -24,5 +25,11 @@ export class UserController {
   @Get('verification')
   async verifiyUserEmail(@Query() {verification}: VerifyEmailDto, id: string) {
     return this.userService.verifyUser({verification}, id)
+  }
+
+  @Get()
+  async findId(@Param() id: string) {
+    // const userId = request.user['userId']
+    return this.userService.findUserById(id)
   }
 }
