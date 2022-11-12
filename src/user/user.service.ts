@@ -9,6 +9,7 @@ import { addHours } from 'date-fns';
 import { omit } from 'lodash';
 import { VerifyEmailDto } from './dto/verifiy-email.dto';
 import crypto, { randomUUID } from 'crypto'
+import { NotFoundException } from '@nestjs/common/exceptions';
 
 @Injectable()
 export class UserService {
@@ -70,6 +71,14 @@ export class UserService {
         return omit(user.toJSON(), privateField)
     }
 
+    async findUserById(id: string) {
+        const user = await this.UserModel.findById(id)
+        if(!user) {
+            throw new NotFoundException('No User Found With ID')
+        }
+
+        return omit(user.toJSON(), privateField)
+    }
 
     private async isEmailTaken(email: string) {
         const user = await this.UserModel.findOne({email, verified: true})
