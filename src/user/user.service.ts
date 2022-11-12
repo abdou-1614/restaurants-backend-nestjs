@@ -1,4 +1,3 @@
-import { hashSync } from 'bcrypt';
 import { CloudinaryService } from './../cloudinary/cloudinary.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -6,9 +5,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { privateField, UserDocument } from './schema/user.schema';
 import { MailService } from 'src/mail/mail.service';
-import {v4 as uuidv4 } from 'uuid'
 import { addHours } from 'date-fns';
 import { omit } from 'lodash';
+import { VerifyEmailDto } from './dto/verifiy-email.dto';
+import crypto, { randomUUID } from 'crypto'
 
 @Injectable()
 export class UserService {
@@ -26,11 +26,10 @@ export class UserService {
     async createUser(input: CreateUserDto) {
         const { fullName, email, password, address, avatar } = input
         await this.isEmailTaken(email)
-        const data = uuidv4()
 
         const image = await this.cloudinary.uploadFile(avatar)
 
-        const verification = hashSync(data, 10)
+        const verification = randomUUID()
 
         const verificationExpires = addHours(new Date(), this.HOURS_TO_VERIFY)
         const user = await this.UserModel.create({
@@ -47,6 +46,28 @@ export class UserService {
         await this.mailService.sendUserConfirmationEmail(user, verification)
         return omit(user.toJSON(), privateField)
 
+    }
+
+    async verifyUser({verification}: VerifyEmailDto, id: string) {
+        const user = await this.UserModel.findOne({verification})
+        if(user.verification === null && user.verified === true) {
+            throw new BadRequestException('User Already Verified! Please Try To Login')
+        }
+
+        if(user.verificationExpires < new Date()) {
+            await this.UserModel.deleteMany({_id: id, })
+            throw new BadRequestException('Verification Link Has Been Expired! Please Request Again')
+        }
+
+        if(!user.verification) {
+            throw new BadRequestException('Invalid Verification Token! Please Check Inbox')
+        }
+
+        user.verified = true
+        user.verification = null,
+        user.verificationExpires = null
+        await user.save()
+        return omit(user.toJSON(), privateField)
     }
 
 
