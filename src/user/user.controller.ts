@@ -1,3 +1,4 @@
+import { FilterQueryDto } from './dto/find-users.dto';
 import { VerifyEmailDto } from './dto/verifiy-email.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common';
@@ -27,9 +28,25 @@ export class UserController {
     return this.userService.verifyUser({verification}, id)
   }
 
-  @Get()
-  async findId(@Param() id: string) {
+  @Get('/find/:id')
+  async findId(@Param('id') id: string) {
     // const userId = request.user['userId']
     return this.userService.findUserById(id)
+  }
+
+  @Get()
+  async findAllUsers(@Query() query: FilterQueryDto) {
+      // let options = {}
+      // if(query.search) {
+      //   options = {
+      //     $or: [
+      //       { name: new RegExp(query.search.toString(), 'i') },
+      //       { email: new RegExp(query.search.toString(), 'i') }
+      //     ]
+      //   }
+      // }
+
+      return this.userService.findAll(query)
+      // return result
   }
 }
