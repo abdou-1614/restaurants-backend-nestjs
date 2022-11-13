@@ -1,3 +1,4 @@
+import { FilterQueryDto } from './dto/find-users.dto';
 import { CloudinaryService } from './../cloudinary/cloudinary.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -78,6 +79,11 @@ export class UserService {
         }
 
         return omit(user.toJSON(), privateField)
+    }
+
+    async findAll(query: FilterQueryDto) {
+        const search = query.search ? { fullName: { $regex : query.search, $options: 'i'} } : {}
+        return await this.UserModel.find(search)
     }
 
     private async isEmailTaken(email: string) {
