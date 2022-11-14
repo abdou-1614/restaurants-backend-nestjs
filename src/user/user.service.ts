@@ -1,3 +1,4 @@
+import { UpdateUserInfo } from './dto/update-user.dto';
 import { ui_projection_field } from './user.projection';
 import { FilterQueryDto } from './dto/find-users.dto';
 import { CloudinaryService } from './../cloudinary/cloudinary.service';
@@ -91,7 +92,27 @@ export class UserService {
             { email: new RegExp(query.search.toString(), 'i')} 
         ] } : {}
 
-       return await this.UserModel.find(search).select(ui_projection_field)
+        // Pagination Logic
+
+        // Defining how much result should be displayed per page
+        const limit = query.limit || 10;
+        // Getting the page passed in query
+        const page = query.page || 1;
+        // Formula which defines how many results should be skipped
+        const skip = limit * (page - 1)
+
+       return await this.UserModel.find(search).select(ui_projection_field).limit(limit).skip(skip)
+    }
+
+    async update(id: string, updateInfo: UpdateUserInfo) {
+        const { email } = updateInfo
+        await this.isEmailTaken(email)
+        const user = await this.UserModel.findByIdAndUpdate(id, updateInfo, {
+            new: true,
+            runValidators: true
+        })
+
+        return omit(user.toJSON(), privateField)
     }
 
     private async isEmailTaken(email: string) {
