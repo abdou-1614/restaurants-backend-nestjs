@@ -36,17 +36,6 @@ export class UserController {
 
   @Get()
   async findAllUsers(@Query() query: FilterQueryDto) {
-      // let options = {}
-      // if(query.search) {
-      //   options = {
-      //     $or: [
-      //       { name: new RegExp(query.search.toString(), 'i') },
-      //       { email: new RegExp(query.search.toString(), 'i') }
-      //     ]
-      //   }
-      // }
-
-      return this.userService.findAll(query)
-      // return result
+    return this.userService.findAll(query)
   }
 }
