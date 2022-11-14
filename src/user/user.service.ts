@@ -1,3 +1,4 @@
+import { ui_projection_field } from './user.projection';
 import { FilterQueryDto } from './dto/find-users.dto';
 import { CloudinaryService } from './../cloudinary/cloudinary.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -11,6 +12,7 @@ import { omit } from 'lodash';
 import { VerifyEmailDto } from './dto/verifiy-email.dto';
 import crypto, { randomUUID } from 'crypto'
 import { NotFoundException } from '@nestjs/common/exceptions';
+import { UserWithoutPassword } from './dto/user-without-password.dto';
 
 @Injectable()
 export class UserService {
@@ -81,7 +83,7 @@ export class UserService {
         return omit(user.toJSON(), privateField)
     }
 
-    async findAll(query: FilterQueryDto) {
+    async findAll(query: FilterQueryDto): Promise<UserWithoutPassword[]> {
 
         // Search Logic
         const search = query.search ? { $or: [ 
@@ -89,8 +91,7 @@ export class UserService {
             { email: new RegExp(query.search.toString(), 'i')} 
         ] } : {}
 
-        const user= await this.UserModel.find(search)
-        return user
+       return await this.UserModel.find(search).select(ui_projection_field)
     }
 
     private async isEmailTaken(email: string) {
