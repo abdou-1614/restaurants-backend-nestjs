@@ -7,6 +7,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadBodyInterceptor } from 'src/common/interceptors/fileUpload.interceptor';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Param, Req } from '@nestjs/common/decorators';
+import { UserWithoutPassword } from './dto/user-without-password.dto';
 
 @ApiTags('Users')
 @Controller('user')
@@ -35,7 +36,7 @@ export class UserController {
   }
 
   @Get()
-  async findAllUsers(@Query() query: FilterQueryDto) {
+  async findAllUsers(@Query() query: FilterQueryDto): Promise<UserWithoutPassword[]> {
     return this.userService.findAll(query)
   }
 }
