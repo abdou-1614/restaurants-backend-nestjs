@@ -26,15 +26,6 @@ export class FilterQueryDto {
     limit?: number
 
     @ApiProperty({
-        name: 'Sort',
-        description: 'Sort The Result By One Or More',
-        required: false
-    })
-    @IsString()
-    @IsOptional()
-    sort?: string
-
-    @ApiProperty({
         name: 'search',
         description: 'Search And Return The Result',
         required: false
