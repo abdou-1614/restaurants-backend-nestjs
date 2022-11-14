@@ -82,8 +82,15 @@ export class UserService {
     }
 
     async findAll(query: FilterQueryDto) {
-        const search = query.search ? { fullName: { $regex : query.search, $options: 'i'} } : {}
-        return await this.UserModel.find(search)
+
+        // Search Logic
+        const search = query.search ? { $or: [ 
+            { fullName: new RegExp(query.search.toString(), 'i')}, 
+            { email: new RegExp(query.search.toString(), 'i')} 
+        ] } : {}
+
+        const user= await this.UserModel.find(search)
+        return user
     }
 
     private async isEmailTaken(email: string) {
