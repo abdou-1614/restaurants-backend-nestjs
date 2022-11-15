@@ -1,3 +1,4 @@
+import { compare } from 'bcrypt';
 import { UpdateUserInfo } from './dto/update-user.dto';
 import { ui_projection_field } from './user.projection';
 import { FilterQueryDto } from './dto/find-users.dto';
@@ -17,6 +18,7 @@ import { UserWithoutPassword } from './dto/user-without-password.dto';
 import { UpdateUserImage } from './dto/update-user-image.dto';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { HttpStatus } from '@nestjs/common/enums';
+import { DeleteCurrentUserDto } from './dto/delete-user.dto';
 
 @Injectable()
 export class UserService {
@@ -150,8 +152,24 @@ export class UserService {
         return new HttpException('User Deleted Successful', HttpStatus.OK)
     }
 
+    async delete(id: string, currentUser: DeleteCurrentUserDto) {
+        await this.validateUserCurrentPassword(id, currentUser.currentPassword)
+        const user = await this.UserModel.findByIdAndDelete(id)
+
+        await this.cloudinary.destroyFile(user.avatarId)
+
+        return new HttpException('User Deleted Successful', HttpStatus.OK)
+    }
+
     private async isEmailTaken(email: string) {
         const user = await this.UserModel.findOne({email, verified: true})
         if(user) throw new BadRequestException('Email Already Taken')
+    }
+
+    private async validateUserCurrentPassword(id: string, currentPassword: string) {
+        const user = await this.UserModel.findById(id)
+        const isValidPassword = await compare(currentPassword, user.password)
+
+        if(!isValidPassword) throw new BadRequestException('Invalid Password! Please Enter Correct Password')
     }
 }
