@@ -11,6 +11,7 @@ import { UserWithoutPassword } from './dto/user-without-password.dto';
 import { UpdateUserInfo } from './dto/update-user.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User, UserDocument } from './schema/user.schema';
+import { UpdateUserImage } from './dto/update-user-image.dto';
 
 @ApiTags('Users')
 @Controller('user')
@@ -49,5 +50,14 @@ export class UserController {
   async updateUserDetails(@CurrentUser() user: UserDocument, @Body() updateInfo: UpdateUserInfo) {
     const userId = user._id
     return this.userService.update(userId, updateInfo)
+  }
+
+  @ApiBody({ type: UpdateUserImage })
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Update User Image' })
+  @Patch('/images')
+  @UseInterceptors(FileInterceptor('avatar'), FileUploadBodyInterceptor )
+  async updateUserImage(@CurrentUser() userId: UserDocument['_id'], @Body() userImage: UpdateUserImage) {
+    return this.userService.updateUserImage(userId, userImage)
   }
 }
