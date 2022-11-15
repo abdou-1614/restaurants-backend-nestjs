@@ -14,6 +14,7 @@ import { VerifyEmailDto } from './dto/verifiy-email.dto';
 import crypto, { randomUUID } from 'crypto'
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { UserWithoutPassword } from './dto/user-without-password.dto';
+import { UpdateUserImage } from './dto/update-user-image.dto';
 
 @Injectable()
 export class UserService {
@@ -113,6 +114,26 @@ export class UserService {
         })
 
         return omit(user.toJSON(), privateField)
+    }
+
+    async updateUserImage(id: string, updateImage: UpdateUserImage, avatarId?: string ) {
+        const { avatar } = updateImage
+
+        await this.cloudinary.destroyFile(avatarId)
+
+        const image = await this.cloudinary.uploadFile(avatar)
+
+
+        const userImage = await this.UserModel.findByIdAndUpdate(id, { 
+            avatar: image.secure_url,
+            avatarId: image.public_id
+         },
+         {
+            new: true,
+            runValidators: true
+         }
+        )
+        return omit(userImage.toJSON(), privateField)
     }
 
     private async isEmailTaken(email: string) {
