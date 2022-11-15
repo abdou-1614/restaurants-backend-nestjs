@@ -1,4 +1,5 @@
 import { CreateUserDto } from './create-user.dto';
-import { PickType } from "@nestjs/swagger";
+import { ApiProperty, PickType } from "@nestjs/swagger";
 
-export class UpdateUserImage extends PickType(CreateUserDto, ['avatar'] as const) {}
+export class UpdateUserImage extends PickType(CreateUserDto, ['avatar'] as const) {
+}
