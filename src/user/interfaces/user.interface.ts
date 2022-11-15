@@ -3,28 +3,44 @@ import { Document } from "mongoose";
 import { Role } from "../schema/user.schema";
 
 export class UserInteface extends Document {
-    @ApiProperty()
+    @ApiProperty({
+        example: 'James Doe'
+    })
     fullName: string
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'example@user.com'
+    })
     email: string
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'World Street 0'
+    })
     address: string
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'password123'
+    })
     password: string
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'https://res.cloudinary.com/dknma8cck/image/upload/v1629291909/EcommerceAPI/Users/admin/xxcrbfkwglqa5c5kay4u.webp'
+    })
     avatar: string
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'xxcrbfkwglqa5c5kay4u'
+    })
     avatarId: string
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'USER'
+    })
     role: Role
 
-    @ApiProperty()
+    @ApiProperty({
+        example: false
+    })
     verified: boolean
 
     @ApiProperty()
@@ -33,7 +49,9 @@ export class UserInteface extends Document {
     @ApiProperty()
     verificationExpires: Date
 
-    @ApiProperty()
+    @ApiProperty({
+        example: true
+    })
     isActive: boolean
 
     @ApiProperty()
