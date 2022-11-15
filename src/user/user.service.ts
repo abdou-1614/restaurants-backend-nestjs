@@ -15,6 +15,8 @@ import crypto, { randomUUID } from 'crypto'
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { UserWithoutPassword } from './dto/user-without-password.dto';
 import { UpdateUserImage } from './dto/update-user-image.dto';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import { HttpStatus } from '@nestjs/common/enums';
 
 @Injectable()
 export class UserService {
@@ -134,6 +136,18 @@ export class UserService {
          }
         )
         return omit(userImage.toJSON(), privateField)
+    }
+
+    async deleteUser(id: string) {
+        const user = await this.UserModel.findByIdAndDelete(id)
+
+        if(!user) {
+            throw new HttpException('User Not Found With This ID', HttpStatus.NOT_FOUND)
+        }
+
+        await this.cloudinary.destroyFile(user.avatarId)
+
+        return new HttpException('User Deleted Successful', HttpStatus.OK)
     }
 
     private async isEmailTaken(email: string) {
