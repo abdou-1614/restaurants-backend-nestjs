@@ -6,7 +6,7 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadBodyInterceptor } from 'src/common/interceptors/fileUpload.interceptor';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Param, Req } from '@nestjs/common/decorators';
+import { Delete, Param, Req } from '@nestjs/common/decorators';
 import { UserWithoutPassword } from './dto/user-without-password.dto';
 import { UpdateUserInfo } from './dto/update-user.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -59,5 +59,11 @@ export class UserController {
   @UseInterceptors(FileInterceptor('avatar'), FileUploadBodyInterceptor )
   async updateUserImage(@CurrentUser() userId: UserDocument['_id'], @Body() userImage: UpdateUserImage) {
     return this.userService.updateUserImage(userId, userImage)
+  }
+
+  @ApiOperation({ summary: 'Delete User With It"s ID' })
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(id)
   }
 }
