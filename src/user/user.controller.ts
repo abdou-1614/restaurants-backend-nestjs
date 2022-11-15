@@ -12,6 +12,7 @@ import { UpdateUserInfo } from './dto/update-user.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User, UserDocument } from './schema/user.schema';
 import { UpdateUserImage } from './dto/update-user-image.dto';
+import { DeleteCurrentUserDto } from './dto/delete-user.dto';
 
 @ApiTags('Users')
 @Controller('user')
@@ -65,5 +66,11 @@ export class UserController {
   @Delete(':id')
   async deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id)
+  }
+
+  @ApiOperation({ summary: 'User Can Delete Own Profile' })
+  @Delete('/me')
+  async deleteMe(@CurrentUser() userId: UserDocument['_id'], @Body() currentUserPassword: DeleteCurrentUserDto) {
+    return this.userService.delete(userId, currentUserPassword)
   }
 }
