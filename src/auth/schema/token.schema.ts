@@ -29,4 +29,4 @@ export class RefreshToken {
     expiresAt: Date
 }
 
-export const RedreshTokenSchema = SchemaFactory.createForClass(RefreshToken)
+export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken)
