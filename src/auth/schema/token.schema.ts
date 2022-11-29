@@ -11,7 +11,7 @@ export class RefreshToken {
         ref: 'User',
         required: true
     })
-    user: User
+    userId: User
 
     @Prop({ type: String, required: true, unique: true })
     family: string
