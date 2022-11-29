@@ -20,4 +20,17 @@ export class MailService {
             }
         })
     }
+
+    async sendUserForgetPassword(user: UserDocument, otp: number) {
+        await this.mailerService.sendMail({
+            to: user.email,
+            subject: 'Reset password OTP',
+            from: 'kirakira1614@gmail.com',
+            template: 'reset-password',
+            context: {
+                name: user.fullName,
+                otp
+            }
+        })
+    }
 }
