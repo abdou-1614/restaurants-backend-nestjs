@@ -196,7 +196,7 @@ export class AuthService {
             user.password = password
             await user.save()
 
-            const browserInfo = this.request.headers['user-agent'] || "XX"
+            const browserInfo = `${this.request.ip} ${this.request.headers['user-agent']} ${this.request.headers['accept-language']}`.replace(/ undefined/g, '')
 
             return {
                 accessToken: await this.generatAccessToken({ sub: user._id, userRole: user.role }),
