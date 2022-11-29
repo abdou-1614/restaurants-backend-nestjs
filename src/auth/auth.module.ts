@@ -1,3 +1,4 @@
+import { MailModule } from './../mail/mail.module';
 import { RefreshTokenSchema } from './schema/token.schema';
 import { ForgotPasswordSchema } from './schema/forgotPassword.schema';
 import { UserSchema } from './../user/schema/user.schema';
@@ -14,7 +15,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     { name: 'Auth', schema: ForgotPasswordSchema }, 
     { name: 'Token', schema: RefreshTokenSchema }, 
     { name: 'User', schema: UserSchema } ]), 
-    PassportModule, JwtModule.register({})],
+    PassportModule, JwtModule.register({}), MailModule],
   controllers: [AuthController],
   providers: [AuthService]
 })
