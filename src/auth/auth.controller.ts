@@ -9,6 +9,7 @@ import { AuthLoginResponse } from './dto/auth-login-response.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserDocument } from 'src/user/schema/user.schema';
+import { ChangeMyPasswordDto } from './dto/change-password.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -54,5 +55,12 @@ export class AuthController {
   @Get('/tokens')
   async findAllTokens(@CurrentUser() userId: UserDocument['_id']){
     return this.authService.findAllTokens(userId)
+  }
+
+  @ApiOperation({ summary: 'User Change Current Password' })
+  @ApiBearerAuth()
+  @Post('/change-my-password')
+  async changeMyPassword(@CurrentUser() userId: UserDocument['_id'], @Body() changePasswordDto: ChangeMyPasswordDto): Promise<AuthLoginResponse> {
+    return this.authService.changeMyPassword(userId, changePasswordDto)
   }
 }
