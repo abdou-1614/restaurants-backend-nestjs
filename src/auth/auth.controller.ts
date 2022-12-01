@@ -1,3 +1,4 @@
+import { VerifyForgotPasswordDto } from './dto/verify-forgot-password.dto';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { LogoutDto } from './dto/logout.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserDocument } from 'src/user/schema/user.schema';
 import { ChangeMyPasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -62,5 +64,19 @@ export class AuthController {
   @Post('/change-my-password')
   async changeMyPassword(@CurrentUser() userId: UserDocument['_id'], @Body() changePasswordDto: ChangeMyPasswordDto): Promise<AuthLoginResponse> {
     return this.authService.changeMyPassword(userId, changePasswordDto)
+  }
+
+  @ApiOperation({ summary: 'Forgot Password User' })
+  @Public()
+  @Post('/forgot-password')
+  async forgetPassword(@Body() forgotPassword: ForgotPasswordDto): Promise<{ forgotPasswordToken: number }> {
+    return this.authService.forgotPassword(forgotPassword)
+  }
+
+  @ApiOperation({ summary: 'Verify Forgot Password Code' })
+  @Public()
+  @Post('/verify-forgot-password')
+  async verifyForgotPassword(@Body() verifyForgotPassword: VerifyForgotPasswordDto) {
+    return this.authService.verifyForgetPassword(verifyForgotPassword)
   }
 }
