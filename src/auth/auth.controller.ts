@@ -12,6 +12,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserDocument } from 'src/user/schema/user.schema';
 import { ChangeMyPasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
+import { PasswordResetDto } from './dto/password-reset.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -73,10 +74,24 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPassword)
   }
 
+  @ApiOperation({ summary: 'Resend Forgot Password OTP' })
+  @Public()
+  @Post('/resend-forgot-password')
+  async resendForgotPassword(@Body() ForgotPassword: ForgotPasswordDto) {
+    return this.authService.resendForgetPassword(ForgotPassword)
+  }
+
   @ApiOperation({ summary: 'Verify Forgot Password Code' })
   @Public()
   @Post('/verify-forgot-password')
   async verifyForgotPassword(@Body() verifyForgotPassword: VerifyForgotPasswordDto) {
     return this.authService.verifyForgetPassword(verifyForgotPassword)
+  }
+
+  @ApiOperation({ summary: 'Reset Password After Verify OTP' })
+  @Public()
+  @Post('/reset-forgot-password')
+  async resetPassword(@Body() resetPasswordDto: PasswordResetDto): Promise<AuthLoginResponse> {
+    return this.authService.resetPassword(resetPasswordDto)
   }
 }
