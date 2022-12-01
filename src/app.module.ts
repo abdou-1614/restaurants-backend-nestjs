@@ -5,6 +5,8 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessJwtGuard } from './auth/auth-jwt.guard';
+import { RestaurantModule } from './restaurant/restaurant.module';
+import { MealModule } from './meal/meal.module';
 
 @Module({
   imports: [
@@ -13,7 +15,9 @@ import { AccessJwtGuard } from './auth/auth-jwt.guard';
     }),
     MongooseModule.forRoot(process.env.DB_URI),
     UserModule,
-    AuthModule
+    AuthModule,
+    RestaurantModule,
+    MealModule
   ],
   providers: [
     {
