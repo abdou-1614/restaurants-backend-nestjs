@@ -11,7 +11,7 @@ import { MealModule } from './meal/meal.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.DB_URI),
     UserModule,
