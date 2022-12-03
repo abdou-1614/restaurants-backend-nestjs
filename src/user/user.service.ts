@@ -79,7 +79,7 @@ export class UserService {
     }
 
     async findUserById(id: string) {
-        const user = await this.UserModel.findById(id)
+        const user = await this.UserModel.findById({ _id: id})
         if(!user) {
             throw new NotFoundException('No User Found With ID')
         }
