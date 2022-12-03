@@ -15,6 +15,7 @@ import { UpdateUserImage } from './dto/update-user-image.dto';
 import { DeleteCurrentUserDto } from './dto/delete-user.dto';
 import { Public } from 'src/auth/public.decorator';
 import { IsAdmin } from 'src/common/decorators/is-admin.decorator';
+import { Request } from 'express';
 
 @ApiTags('Users')
 @Controller('user')
@@ -41,7 +42,8 @@ export class UserController {
   @ApiOperation({ summary: 'Gets user"s own profile' })
   @ApiBearerAuth()
   @Get('/id')
-  async findId(@CurrentUser() userId: UserDocument['_id']) {
+  async findId(@Req() request: Request ) {
+    const userId = request.user['userId']
     return this.userService.findUserById(userId)
   }
 
@@ -55,8 +57,8 @@ export class UserController {
   @ApiOperation({ summary: 'Update User Profile' })
   @ApiBearerAuth()
   @Patch()
-  async updateUserDetails(@CurrentUser() user: UserDocument, @Body() updateInfo: UpdateUserInfo) {
-    const userId = user._id
+  async updateUserDetails(@Req() request: Request, @Body() updateInfo: UpdateUserInfo) {
+    const userId = request.user['userId']
     return this.userService.update(userId, updateInfo)
   }
 
@@ -66,7 +68,8 @@ export class UserController {
   @ApiOperation({ summary: 'Update User Image' })
   @Patch('/images')
   @UseInterceptors(FileInterceptor('avatar'), FileUploadBodyInterceptor )
-  async updateUserImage(@CurrentUser() userId: UserDocument['_id'], @Body() userImage: UpdateUserImage) {
+  async updateUserImage(@Req() request: Request, @Body() userImage: UpdateUserImage) {
+    const userId = request.user['userId']
     return this.userService.updateUserImage(userId, userImage)
   }
 
