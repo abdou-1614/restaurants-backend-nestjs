@@ -36,6 +36,7 @@
     "class-validator": "^0.13.2",
     "cloudinary": "^1.32.0",
     "date-fns": "^2.29.3",
+    "dotenv": "^16.0.3",
     "faker": "^6.6.6",
     "handlebars": "^4.7.7",
     "lodash": "^4.17.21",
