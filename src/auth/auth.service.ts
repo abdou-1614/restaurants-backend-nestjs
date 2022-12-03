@@ -1,21 +1,20 @@
+import { JwtSignOptions } from '@nestjs/jwt';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { PasswordResetDto } from './dto/password-reset.dto';
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ChangeMyPasswordDto } from './dto/change-password.dto';
 import { InvalidRefreshTokenException } from './exceptions/invalid-refresh-token.exception';
 import { RefreshTokenPayload } from './types/refresh-token-payload';
-import { refreshTokenConfig } from 'src/config/jwt.config';
 import { compare } from 'bcrypt';
-import { InvalidEmailOrPasswordException } from './exceptions/invalid-email-or-password.exception';
 import { RefreshTokenDocument } from './schema/token.schema';
 import { privateField, UserDocument } from './../user/schema/user.schema';
-import { Injectable, BadRequestException, UnauthorizedException, Inject } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { ForgotPasswordDocument } from './schema/forgotPassword.schema';
 import { omit } from 'lodash';
 import { JwtService } from '@nestjs/jwt';
-import { accessTokenConfig } from 'src/config/jwt.config';
 import { getTokenExpirationDate } from 'src/utils/tokenExpirationDate.utils';
 import { v4 as uuidv4 } from 'uuid'
 import global from '../constants/global.constants'
@@ -26,6 +25,7 @@ import { Request } from 'express';
 import { getClientIp } from 'request-ip';
 import { MailService } from 'src/mail/mail.service';
 import { VerifyForgotPasswordDto } from './dto/verify-forgot-password.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -40,7 +40,8 @@ export class AuthService {
         @InjectModel('Auth') private forgotPasswordModel: Model<ForgotPasswordDocument>,
         private readonly mailService: MailService,
         @Inject(REQUEST) private request: Request,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private configService: ConfigService
         ) {}
 
         async signIn(email: string, password: string, browserInfo?: string): Promise<AuthLoginResponse> {
@@ -61,7 +62,11 @@ export class AuthService {
         }
 
         async refreshToken(refreshToken: string, browserInfo?: string): Promise<AuthLoginResponse> {
-            const refreshTokenContent: RefreshTokenPayload = await this.jwtService.verifyAsync(refreshToken, refreshTokenConfig)
+            const refreshConfig: JwtSignOptions = {
+                secret: this.configService.get<string>('ACCESS_JWT_SECRET'),
+                expiresIn: this.configService.get<string>('EXPIRESIN')
+            }
+            const refreshTokenContent: RefreshTokenPayload = await this.jwtService.verifyAsync(refreshToken, refreshConfig)
 
             await this.validateRefreshToken(refreshToken, refreshTokenContent)
 
@@ -237,7 +242,7 @@ export class AuthService {
         private async validateUser(email: string, password: string) {
             const user = await this.userModel.findOne({ email, verified: true, isActive: true })
             if(!user) {
-                throw new InvalidEmailOrPasswordException()
+                throw new HttpException('Invalid Email Or Password', HttpStatus.BAD_REQUEST)
             }
 
             this.isUserBlocked(user)
@@ -253,7 +258,11 @@ export class AuthService {
         }
 
         private async generatAccessToken(payload: { sub: string, userRole: string }) {
-            const accessToken = await this.jwtService.signAsync(payload, accessTokenConfig)
+            const accessConfig: JwtSignOptions = {
+                secret: this.configService.get<string>('ACCESS_JWT_SECRET'),
+                expiresIn: this.configService.get<string>('EXPIRESIN1')
+            }
+            const accessToken = await this.jwtService.signAsync(payload, accessConfig)
             return accessToken
         }
 
@@ -262,7 +271,12 @@ export class AuthService {
                 payload.family = uuidv4()
             }
 
-            const refreshToken = await this.jwtService.sign(payload, refreshTokenConfig)
+            const refreshConfig: JwtSignOptions = {
+                secret: this.configService.get<string>('ACCESS_JWT_SECRET'),
+                expiresIn: this.configService.get<string>('EXPIRESIN')
+            }
+
+            const refreshToken = await this.jwtService.signAsync(payload, refreshConfig)
 
             await this.saveRefreshToken({
                 userId: payload.sub,
@@ -350,7 +364,7 @@ export class AuthService {
                     await user.save()
                     throw new BadRequestException('User Blocked, Please Try After 1 Hour')
                 }
-                throw new UnauthorizedException()
+                throw new HttpException('Invalid Email Or Password', HttpStatus.BAD_REQUEST)
             }
             user.confirmationAttemptsCount = 0
             await user.save()
