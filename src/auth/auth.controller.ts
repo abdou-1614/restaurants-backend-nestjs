@@ -32,7 +32,7 @@ export class AuthController {
   @ApiOkResponse({ type: AuthLoginResponse })
   @ApiOperation({ summary: 'RefereshToken' })
   @Public()
-  @Post('/refresToken')
+  @Post('/refreshToken')
   async refreshToken(@Req() request: Request, @Body() { refreshToken }: RefreshTokenDto): Promise<AuthLoginResponse> {
     const browserInfo = `${request.ip} ${request.headers['user-agent']} ${request.headers['accept-language']}`.replace(/ undefined/g, '')
 
@@ -49,21 +49,24 @@ export class AuthController {
   @ApiOperation({ summary: 'Logs out user of all sessions' })
   @ApiBearerAuth()
   @Post('/logoutAll')
-  async logouAll(@CurrentUser() userId: UserDocument['_id']) {
+  async logouAll(@Req() request: Request) {
+    const { userId } = request.user as { userId: string };
     return this.authService.logoutAll(userId)
   }
 
   @ApiOperation({ summary: 'Returns all user active tokens' })
   @ApiBearerAuth()
   @Get('/tokens')
-  async findAllTokens(@CurrentUser() userId: UserDocument['_id']){
+  async findAllTokens(@Req() request: Request){
+    const { userId } = request.user as { userId: string };
     return this.authService.findAllTokens(userId)
   }
 
   @ApiOperation({ summary: 'User Change Current Password' })
   @ApiBearerAuth()
   @Post('/change-my-password')
-  async changeMyPassword(@CurrentUser() userId: UserDocument['_id'], @Body() changePasswordDto: ChangeMyPasswordDto): Promise<AuthLoginResponse> {
+  async changeMyPassword(@Req() request: Request, @Body() changePasswordDto: ChangeMyPasswordDto): Promise<AuthLoginResponse> {
+    const { userId } = request.user as { userId: string };
     return this.authService.changeMyPassword(userId, changePasswordDto)
   }
 
