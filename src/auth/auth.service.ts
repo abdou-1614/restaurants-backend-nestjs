@@ -112,7 +112,7 @@ export class AuthService {
                 throw new BadRequestException('Wrong mongoose ID Error. Please, enter the correct ID')
             }
 
-            const user = await this.userModel.findOne({ _id: isValidObjectId(id) }).select("password")
+            const user = await this.userModel.findOne({ _id: id }).select("password")
 
             const isCorrectPassword = await compare(old_password, user.password)
             if(!isCorrectPassword) {
@@ -160,26 +160,21 @@ export class AuthService {
                 throw new NotFoundException('User Not Found')
             }
 
-            const forgotPassword = await this.forgotPasswordModel.findOne({ forgotPasswordToken: token })
+            const forgotPassword = await this.forgotPasswordModel.findOne({user: user._id, used: false })
 
-            const { forgotPasswordExpires, forgotPasswordToken } = forgotPassword
-
-            let user_id;
-
-            if(forgotPasswordExpires < new Date()) {
-                user_id = user._id
-                await this.forgotPasswordModel.deleteMany({ user: user_id })
-                throw new BadRequestException('Code Has Been Expired! Please Request Again')
-            }
-
-            if(forgotPasswordToken !== token) {
+            
+            if(forgotPassword.forgotPasswordToken !== token) {
                 throw new BadRequestException('Invalid Code Passed! Please Check Your Inbox')
             }
 
-            forgotPassword.used = true
-            forgotPassword.forgotPasswordToken = null
+            if(forgotPassword.forgotPasswordExpires < new Date()) {
+                await this.forgotPasswordModel.deleteMany({ user: user._id })
+                throw new BadRequestException('Code Has Been Expired! Please Request Again')
+            }
 
-            await user.save()
+
+            forgotPassword.used = true
+            await forgotPassword.save()
             return 'Okay, Now Reset Your Password'
         }
 
@@ -309,7 +304,6 @@ export class AuthService {
 
             if(!isValidRefreshToken) {
                 await this.removeRefreshTokenFamilyIfCompromised(
-                    refreshTokenContent.sub,
                     refreshTokenContent.tokenFamily
                 )
 
@@ -319,17 +313,17 @@ export class AuthService {
             return true
         }
 
-        private async removeRefreshTokenFamilyIfCompromised(userId: string, tokenFamily: string) {
-            const familyTokens = await this.refreshTokenModel.findOne({userId, family: tokenFamily})
+        private async removeRefreshTokenFamilyIfCompromised(tokenFamily: string) {
+            const familyTokens = await this.refreshTokenModel.findOne({family: tokenFamily})
             const { family } = familyTokens
 
             if(family.length > 0) {
-                return this.refreshTokenModel.findOneAndDelete({family })
+                return this.refreshTokenModel.deleteMany({ family })
             }
         } 
 
         private async rotateRefreshToken(refreshToken: string, refreshTokenContent: RefreshTokenPayload, browserInfo?: string) {
-            await this.refreshTokenModel.findOneAndDelete({refreshToken})
+            await this.refreshTokenModel.deleteMany({refreshToken})
 
             const newRefreshToken = await this.createRefreshToken({
                sub: refreshTokenContent.sub,
@@ -342,7 +336,7 @@ export class AuthService {
         }
 
         private async getUserRole(userId: string) {
-            const user = await this.userModel.findById({id: userId})
+            const user = await this.userModel.findById({ _id: userId})
             return user.role
         }
 
