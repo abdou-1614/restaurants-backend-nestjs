@@ -15,7 +15,7 @@ import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars
                     host: 'smtp.sendgrid.net',
                     auth: {
                         user: 'apikey',
-                        pass: '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'
+                        pass: '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'
                     }
                 },
                 defaults: {
