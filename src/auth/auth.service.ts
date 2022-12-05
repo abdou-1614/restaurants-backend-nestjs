@@ -173,8 +173,7 @@ export class AuthService {
             }
 
 
-            forgotPassword.used = true
-            await forgotPassword.save()
+            await this.forgotPasswordModel.updateMany({user: user._id}, {$set: { forgotPasswordToken: null, used: true }});
             return 'Okay, Now Reset Your Password'
         }
 
