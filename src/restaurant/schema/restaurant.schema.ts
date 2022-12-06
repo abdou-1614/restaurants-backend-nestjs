@@ -37,6 +37,12 @@ export class Restaurant {
     @Prop({ type: Array })
     imagesId: Array<any>
 
+    @Prop({ type: Number, default: 4.5, min: [1, "Rating Must Be Above 1.0"], max: [5, "Rating Must Be Below 5"], set: (val: number) => Math.round(val * 10) / 10, get: (val: number) => val })
+    ratingAverage: number
+
+    @Prop({ type: Number, default: 0 })
+    ratingQuantity: number
+
     @Prop({ enum: Category })
     category: Category
 
