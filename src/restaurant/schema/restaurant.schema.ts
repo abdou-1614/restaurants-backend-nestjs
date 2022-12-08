@@ -14,7 +14,7 @@ export enum Category {
     PIZZA_DELIVERY = 'Pizza Delivery'
 }
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, toJSON: { virtuals: true } })
 export class Restaurant {
 
     @Prop({ type: String, required: true })
@@ -33,7 +33,7 @@ export class Restaurant {
     address: string
 
     @Prop({ type: [String], required: true })
-    images: string[]
+    images: [string]
 
     @Prop({ type: Array })
     imagesId: Array<any>
@@ -48,13 +48,19 @@ export class Restaurant {
     category: Category
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-    user: User
+    user?: User
 
     @Prop({ type: Object, ref: 'Location'})
     location?: Location
 
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Meal' }])
-    menu: Meal[]
+    menu?: Meal[]
 }
 
 export const RestaurantSchema = SchemaFactory.createForClass(Restaurant)
+
+RestaurantSchema.virtual('reviews', {
+    ref: 'User',
+    foreignField: 'product',
+    localField: '_id'
+})
