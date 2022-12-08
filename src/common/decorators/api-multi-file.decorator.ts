@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptions } from "@nestjs/swagger";
 
 export const ApiMultiFile = (options?: ApiPropertyOptions): PropertyDecorator => (
-    target: object,
+    target: Object,
     propertyKey?: string | symbol
 ) => {
     if(options?.isArray) {
