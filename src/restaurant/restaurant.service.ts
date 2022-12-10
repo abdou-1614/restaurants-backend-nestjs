@@ -4,8 +4,8 @@ import { Restaurant } from './schema/restaurant.schema';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ApiFeatures } from 'src/utils/apiFeatures.utils';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FindRestaurantQueryDto } from './dto/find-restaurant.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -47,5 +47,33 @@ export class RestaurantService {
             category,
             description
         })
+    }
+
+    async findAll(query: FindRestaurantQueryDto) {
+
+        //1) Pagination Logic
+
+        const page = query.page || 1
+
+        const limit = query.limit || 10
+
+        const skip = limit * (page - 1)
+
+        // 2) Search Logic
+        const search = query.search ? {
+            $or: [
+                { name: { 
+                    $regex: query.search,
+                    $options: 'i'
+                 }, 
+                },
+                { desciption: {
+                    $regex: query.search,
+                    $options: 'i'
+                 }
+                }
+            ]
+        } : {}
+        return this.restaurantModel.find(search).limit(limit).skip(skip)
     }
 }
