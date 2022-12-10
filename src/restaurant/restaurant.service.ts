@@ -1,9 +1,10 @@
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { UserDocument } from './../user/schema/user.schema';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { Restaurant } from './schema/restaurant.schema';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FindRestaurantQueryDto } from './dto/find-restaurant.dto';
 
@@ -49,7 +50,7 @@ export class RestaurantService {
         })
     }
 
-    async findAll(query: FindRestaurantQueryDto) {
+    async findAll(query: FindRestaurantQueryDto): Promise<Restaurant[]> {
 
         //1) Pagination Logic
 
@@ -75,5 +76,18 @@ export class RestaurantService {
             ]
         } : {}
         return this.restaurantModel.find(search).limit(limit).skip(skip)
+    }
+
+    async findById(id: string): Promise<Restaurant> {
+        const isValidId = mongoose.isValidObjectId(id)
+        if(!isValidId) {
+            throw new BadRequestException('Wrong mongoose ID Error. Please, enter the correct ID')
+        }
+
+        const restaurant = await this.restaurantModel.findById({ _id: id })
+
+        if(!restaurant) throw new NotFoundException('Restaurant Not Found')
+
+        return restaurant
     }
 }
