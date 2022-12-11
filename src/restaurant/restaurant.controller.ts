@@ -1,5 +1,7 @@
+import { Public } from './../auth/public.decorator';
+import { UpdateRestaurantDetailsDto } from './dto/update-restaurant.dto';
 import { MultiFilesBodyInterceptor } from './../common/interceptors/multi-file.interceptor';
-import { Body, Controller, Get, Param, Post, Query, Req, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UseInterceptors, Patch } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -36,5 +38,12 @@ export class RestaurantController {
   @Get('restaurant/:id')
   async findByID(@Param('id') id: string ): Promise<Restaurant> {
     return this.restaurantService.findById(id)
+  }
+
+  @ApiOperation({ summary: 'Update Restaurant Details' })
+  @ApiBearerAuth()
+  @Patch('update-restaurant/:id')
+  async update(@Param('id') id: string, @Body() input: UpdateRestaurantDetailsDto) {
+    return this.restaurantService.updateDetails(id, input)
   }
 }
