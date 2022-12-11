@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common/exceptions';
+import { ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
 import { UserDocument } from './../user/schema/user.schema';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { Restaurant } from './schema/restaurant.schema';
@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FindRestaurantQueryDto } from './dto/find-restaurant.dto';
+import { UpdateRestaurantDetailsDto } from './dto/update-restaurant.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -89,5 +90,16 @@ export class RestaurantService {
         if(!restaurant) throw new NotFoundException('Restaurant Not Found')
 
         return restaurant
+    }
+
+    async updateDetails(id: string, updateDto: UpdateRestaurantDetailsDto) {
+        const restaurantFound = await this.restaurantModel.findById({ _id: id })
+
+        if(!restaurantFound) throw new NotFoundException('Restaurant Not Found')
+
+        return await this.restaurantModel.findByIdAndUpdate(id, updateDto, {
+            new: true,
+            runValidators: true
+        })
     }
 }
