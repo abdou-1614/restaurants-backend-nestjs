@@ -2,9 +2,9 @@ import { UpdateImagesDto } from './dto/update-restaurant-images.dto';
 import { Public } from './../auth/public.decorator';
 import { UpdateRestaurantDetailsDto } from './dto/update-restaurant.dto';
 import { MultiFilesBodyInterceptor } from './../common/interceptors/multi-file.interceptor';
-import { Body, Controller, Get, Param, Post, Put, Query, Req, UseInterceptors, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UseInterceptors, Patch, Delete } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags, ApiOkResponse, ApiResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { RestaurantService } from './restaurant.service';
@@ -56,5 +56,16 @@ export class RestaurantController {
   @Patch('update-images-restaurant/:id')
   async updateImage(@Param('id') id: string, @Body() input: UpdateImagesDto) {
     return this.restaurantService.updateRestaurantImage(id, input)
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Successful Restaurant Delete'
+  })
+  @ApiOperation({ summary: 'Delete Restaurant' })
+  @ApiBearerAuth()
+  @Delete('delete-restaurant')
+  async delete(@Param('id') id: string): Promise<string> {
+    return this.restaurantService.delete(id)
   }
 }
