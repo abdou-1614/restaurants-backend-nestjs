@@ -137,4 +137,19 @@ export class RestaurantService {
             runValidators: true
         })
     }
+
+    async delete(id: string): Promise<string> {
+        const restaurant = await this.restaurantModel.findById({ _id: id })
+        if(!restaurant){
+            throw new NotFoundException('Restaurant Not Found')
+        }
+
+        const restaurantImageId = restaurant.imagesId
+
+        restaurantImageId.forEach((image) => this.cloudinary.destroyFile(image))
+
+        await this.restaurantModel.findByIdAndDelete(id) 
+
+        return 'Restaurant Deleted Successful'
+    }
 }
