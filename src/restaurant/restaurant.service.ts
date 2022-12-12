@@ -8,6 +8,7 @@ import mongoose, { Model } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FindRestaurantQueryDto } from './dto/find-restaurant.dto';
 import { UpdateRestaurantDetailsDto } from './dto/update-restaurant.dto';
+import { UpdateImagesDto } from './dto/update-restaurant-images.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -98,6 +99,40 @@ export class RestaurantService {
         if(!restaurantFound) throw new NotFoundException('Restaurant Not Found')
 
         return await this.restaurantModel.findByIdAndUpdate(id, updateDto, {
+            new: true,
+            runValidators: true
+        })
+    }
+
+    async updateRestaurantImage(id: string, imageDto: UpdateImagesDto) {
+        const { images } = imageDto
+
+        images.filter((image) => image.fieldname === 'image')
+
+        const restaurant = await this.restaurantModel.findById({ _id: id })
+        if(!restaurant) throw new NotFoundException('Restaurant Not Found')
+
+        const imagesLink = []
+        const imagesIDs = []
+        const restaurantImageId = restaurant.imagesId
+
+        restaurantImageId.forEach((image) => this.cloudinary.destroyFile(image))
+
+        const imagesPromise = images.map(async (image) => await this.cloudinary.uploadFile(image))
+
+        const imagesResult = await Promise.all(imagesPromise)
+
+        imagesResult.forEach((image) => {
+            imagesLink.push(image.secure_url)
+            imagesIDs.push(image.public_id)
+        })
+
+        const restaurantBody = {
+            images: imagesLink,
+            imagesId: imagesIDs
+        }
+
+        return await this.restaurantModel.findByIdAndUpdate(id, restaurantBody, {
             new: true,
             runValidators: true
         })
