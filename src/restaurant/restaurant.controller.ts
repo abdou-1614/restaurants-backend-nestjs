@@ -1,3 +1,4 @@
+import { UpdateImagesDto } from './dto/update-restaurant-images.dto';
 import { Public } from './../auth/public.decorator';
 import { UpdateRestaurantDetailsDto } from './dto/update-restaurant.dto';
 import { MultiFilesBodyInterceptor } from './../common/interceptors/multi-file.interceptor';
@@ -45,5 +46,15 @@ export class RestaurantController {
   @Patch('update-restaurant/:id')
   async update(@Param('id') id: string, @Body() input: UpdateRestaurantDetailsDto) {
     return this.restaurantService.updateDetails(id, input)
+  }
+
+  @ApiBearerAuth()
+  @ApiBody({ type: UpdateImagesDto })
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Update Restaurant Images' })
+  @UseInterceptors(FilesInterceptor('images'), MultiFilesBodyInterceptor)
+  @Patch('update-images-restaurant/:id')
+  async updateImage(@Param('id') id: string, @Body() input: UpdateImagesDto) {
+    return this.restaurantService.updateRestaurantImage(id, input)
   }
 }
