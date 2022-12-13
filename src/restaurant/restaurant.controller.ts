@@ -68,4 +68,11 @@ export class RestaurantController {
   async delete(@Param('id') id: string): Promise<string> {
     return this.restaurantService.delete(id)
   }
+
+  @ApiOperation({ summary: 'Get Top 5 Rated Restaurant' })
+  @ApiBearerAuth()
+  @Get('top-5-resraurant')
+  async findTop() {
+      return this.restaurantService.findTopRatingRestaurant()
+  }
 }
