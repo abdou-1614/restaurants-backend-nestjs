@@ -152,4 +152,8 @@ export class RestaurantService {
 
         return 'Restaurant Deleted Successful'
     }
+
+    async findTopRatingRestaurant() {
+        return this.restaurantModel.find().sort({ ratingAverage: -1 }).limit(5)
+    }
 }
