@@ -1,3 +1,4 @@
+import { Restaurant } from './../../restaurant/schema/restaurant.schema';
 import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from "../schema/meal.schema"
@@ -42,4 +43,6 @@ export class CreateMealDto {
     @IsEnum(Category, { message: 'Please, enter the correct category' })
     @IsNotEmpty()
     category:Category
+
+    restaurant: Restaurant
 }
