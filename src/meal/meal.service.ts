@@ -6,6 +6,7 @@ import { Restaurant } from 'src/restaurant/schema/restaurant.schema';
 import { User, UserDocument } from 'src/user/schema/user.schema';
 import { CreateMealDto } from './dto/create-meal.dto';
 import { Meal } from './schema/meal.schema';
+import { UpdateMealDto } from './dto/update-meal.dto';
 
 @Injectable()
 export class MealService {
@@ -52,5 +53,20 @@ export class MealService {
             if(!mealFound) throw new NotFoundException('Meal Not Found')      
             
             return mealFound
+        }
+
+        async updateMeal(id: string, input: UpdateMealDto, userId: string) {
+            const meal = await this.mealModel.findById({ _id: id})
+
+            if(meal.user.toString() !== userId.toString()) {
+                throw new ForbiddenException(
+                    'You cannot update a meal to this restaurant',
+                  );
+            }
+
+            return await this.mealModel.findByIdAndUpdate(id, input, {
+                new: true,
+                runValidators: true
+            })
         }
 }
