@@ -14,17 +14,17 @@ export class MealService {
         @InjectModel(Meal.name) private mealModel: Model<Meal>
         ) {}
 
-        async create(input: CreateMealDto, user: UserDocument) {
+        async create(input: CreateMealDto, user: string) {
             const restaurant = await this.restaurantModel.findById(input.restaurant)
 
             if(!restaurant) throw new NotFoundException('Restaurant Not Found')
 
-            if(restaurant.user.toString() !== user._id.toString()) {
+            if(restaurant.user.toString() !== user.toString()) {
                 throw new ForbiddenException('You cannot add a meal to this restaurant');
             }
             const meal = await this.mealModel.create({
                 ...input,
-                user: user._id
+                user: user
             })
 
             restaurant.menu.push(meal)
