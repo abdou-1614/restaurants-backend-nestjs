@@ -1,5 +1,6 @@
+import { UpdateMealDto } from './dto/update-meal.dto';
 import { CreateMealDto } from './dto/create-meal.dto';
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { MealService } from './meal.service';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -42,6 +43,18 @@ export class MealController {
   @Get('find-restaurant/:id')
   async findRestaurant(@Param('id') restaurantId: string) {
     return this.mealService.findAllRestaurant(restaurantId)
+  }
+
+  @ApiOkResponse({
+    description: 'Meal Updated Successful',
+    type: CreateMealDto
+  })
+  @ApiOperation({ summary: 'Update Meal' })
+  @ApiBearerAuth()
+  @Put('update-meal/:id')
+  async update(@Param('id') id: string, @Body() input: UpdateMealDto, @Req() request: Request) {
+    const { userId } = request.user as { userId: string }
+    return this.mealService.updateMeal(id, input, userId)
   }
 
 }
