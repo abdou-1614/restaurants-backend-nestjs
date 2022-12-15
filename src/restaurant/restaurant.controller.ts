@@ -23,7 +23,7 @@ export class RestaurantController {
   @Post('create-restaurant')
   @UseInterceptors(FilesInterceptor('images'), MultiFilesBodyInterceptor)
   async create(@Body() createInput: CreateRestaurantDto, @Req() request: Request) {
-    const userId = request.user['userId'] 
+    const { userId } = request.user as { userId: string };
     return this.restaurantService.createRestaurant(createInput, userId)
   }
 
