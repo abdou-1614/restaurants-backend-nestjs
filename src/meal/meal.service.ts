@@ -1,7 +1,7 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Restaurant } from 'src/restaurant/schema/restaurant.schema';
 import { User, UserDocument } from 'src/user/schema/user.schema';
 import { CreateMealDto } from './dto/create-meal.dto';
@@ -36,5 +36,21 @@ export class MealService {
 
         async findAll(): Promise<Meal[]> {
             return await this.mealModel.find()
+        }
+
+        async findAllRestaurant(restaurantId: string) {
+            return this.mealModel.find({ restaurant: restaurantId })
+        }
+
+        async findByID(id: string) {
+            const isValidID = mongoose.isValidObjectId(id)
+
+            if(!isValidID) throw new BadRequestException('Wrong mongoose ID error')
+
+            const mealFound = await this.mealModel.findById({ _id: id })
+
+            if(!mealFound) throw new NotFoundException('Meal Not Found')      
+            
+            return mealFound
         }
 }
