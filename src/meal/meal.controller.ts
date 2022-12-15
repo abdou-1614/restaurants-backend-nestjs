@@ -17,7 +17,7 @@ export class MealController {
   @ApiBearerAuth()
   @Post('create-meal')
   async createMeal(@Body() input: CreateMealDto, @Req() request: Request) {
-    const userId = request.user['userId']
+    const { userId } = request.user as { userId: string };
     return this.mealService.create(input, userId)
   }
 }
