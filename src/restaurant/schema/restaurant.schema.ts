@@ -48,7 +48,7 @@ export class Restaurant {
     category: Category
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-    user?: User
+    user: User
 
     @Prop({ type: Object, ref: 'Location'})
     location?: Location
@@ -60,7 +60,7 @@ export class Restaurant {
 export const RestaurantSchema = SchemaFactory.createForClass(Restaurant)
 
 RestaurantSchema.virtual('reviews', {
-    ref: 'User',
-    foreignField: 'product',
+    ref: 'Review',
+    foreignField: 'restaueant',
     localField: '_id'
 })
