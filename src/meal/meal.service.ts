@@ -33,4 +33,8 @@ export class MealService {
 
             return meal
         }
+
+        async findAll(): Promise<Meal[]> {
+            return await this.mealModel.find()
+        }
 }
