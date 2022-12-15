@@ -22,7 +22,6 @@ export class CreateMealDto {
     })
     @IsString()
     @IsNotEmpty()
-    @Min(6)
     description: string
 
     @ApiProperty({
@@ -44,5 +43,8 @@ export class CreateMealDto {
     @IsNotEmpty()
     category:Category
 
-    restaurant: Restaurant
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    restaurant: string
 }
