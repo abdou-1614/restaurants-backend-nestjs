@@ -17,7 +17,7 @@ export class RestaurantService {
         private readonly cloudinary: CloudinaryService
     ) {}
 
-    async createRestaurant(CreateRestaurantInput: CreateRestaurantDto, user: UserDocument) {
+    async createRestaurant(CreateRestaurantInput: CreateRestaurantDto, user: any) {
         const { name, address, category, description, email, images, phoneNo } = CreateRestaurantInput
 
         images.filter((img) => img.fieldname === 'images')
@@ -45,7 +45,7 @@ export class RestaurantService {
             address,
             images: imagesLink,
             imagesId: imagesIds,
-            user: user._id,
+            user: user,
             phoneNo,
             category,
             description
