@@ -1,5 +1,5 @@
 import { CreateMealDto } from './dto/create-meal.dto';
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { MealService } from './meal.service';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -31,4 +31,17 @@ export class MealController {
   async findAll(): Promise<Meal[]> {
     return this.mealService.findAll()
   }
+
+  @ApiOperation({ summary: 'Find Meals By ID' })
+  @Get('id')
+  async findById(@Param('id') id: string) {
+    return this.mealService.findByID(id)
+  }
+
+  @ApiOperation({ summary: 'Find Restaurant By Its ID' })
+  @Get('find-restaurant/:id')
+  async findRestaurant(@Param('id') restaurantId: string) {
+    return this.mealService.findAllRestaurant(restaurantId)
+  }
+
 }
