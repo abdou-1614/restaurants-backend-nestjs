@@ -154,6 +154,6 @@ export class RestaurantService {
     }
 
     async findTopRatingRestaurant() {
-        return this.restaurantModel.find().sort({ ratingAverage: -1 }).limit(5)
+        return await this.restaurantModel.find().sort({ 'ratingAverage': -1 }).limit(5)
     }
 }
