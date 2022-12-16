@@ -64,7 +64,7 @@ export class RestaurantController {
   })
   @ApiOperation({ summary: 'Delete Restaurant' })
   @ApiBearerAuth()
-  @Delete('delete-restaurant')
+  @Delete('delete-restaurant/:id')
   async delete(@Param('id') id: string): Promise<string> {
     return this.restaurantService.delete(id)
   }
