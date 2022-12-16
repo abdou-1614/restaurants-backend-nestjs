@@ -43,7 +43,9 @@ export class CreateMealDto {
     @IsNotEmpty()
     category:Category
 
-    @ApiProperty()
+    @ApiProperty({
+        example: '639a5796f5c0bf098d83abb5'
+    })
     @IsNotEmpty()
     @IsString()
     restaurant: string
