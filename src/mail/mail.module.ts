@@ -12,10 +12,10 @@ import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
                 transport: {
-                    host: 'smtp.sendgrid.net',
+                    host: configService.get<string>('MAIL_HOST'),
                     auth: {
-                        user: 'apikey',
-                        pass: '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'
+                        user: configService.get<string>('MAIL_USER'),
+                        pass: configService.get<string>('MAIL_PASSWORD')
                     }
                 },
                 defaults: {
@@ -29,7 +29,8 @@ import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars
                     }
                 }
             })
-        })
+        }),
+        ConfigModule
     ],
     providers: [MailService],
     exports: [MailService]
