@@ -39,6 +39,10 @@ export class MealService {
             return await this.mealModel.find()
         }
 
+        async findCheapMeal(): Promise<Meal[]> {
+            return await this.mealModel.find().sort({ "price": 1 }).limit(5)
+        }
+
         async findAllRestaurant(restaurantId: string) {
             return this.mealModel.find({ restaurant: restaurantId })
         }
@@ -68,5 +72,21 @@ export class MealService {
                 new: true,
                 runValidators: true
             })
+        }
+
+        async deleteMeal(id: string, userId: string) {
+            const meal = await this.mealModel.findById({ _id: id })
+
+            if(!meal) throw new NotFoundException('Meal Not Found')
+
+            if(meal.user.toString() !== userId.toString()) {
+                throw new ForbiddenException(
+                    'You cannot update a meal to this restaurant',
+                  );
+            }
+
+            await this.mealModel.findByIdAndDelete(id)
+
+            return 'Meal Deleted Succesfull'
         }
 }
