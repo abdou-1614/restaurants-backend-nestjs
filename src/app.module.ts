@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AccessJwtGuard } from './auth/auth-jwt.guard';
 import { RestaurantModule } from './restaurant/restaurant.module';
 import { MealModule } from './meal/meal.module';
+import { ReviewModule } from './review/review.module';
 
 
 @Module({
@@ -18,7 +19,8 @@ import { MealModule } from './meal/meal.module';
     UserModule,
     AuthModule,
     RestaurantModule,
-    MealModule
+    MealModule,
+    ReviewModule
   ],
   providers: [
     {
