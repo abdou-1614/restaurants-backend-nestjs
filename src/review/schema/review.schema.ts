@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
-import { Restaurant } from "src/restaurant/schema/restaurant.schema";
+import { Restaurant, RestaurantDocument } from "src/restaurant/schema/restaurant.schema";
 import { User } from "src/user/schema/user.schema";
 
 export type ReviewDocument = Review & mongoose.Document
@@ -8,10 +8,10 @@ export type ReviewDocument = Review & mongoose.Document
 @Schema({ 
     timestamps: true,
     statics: {
-        async calcAvgRating(this: ReviewModel , model: RestaurantModel, restaurantId: string) {
+        async calcAvgRating(this: ReviewModel , model: RestaurantModel, id: string) {
             const stats = await this.aggregate([
                 {
-                    $match: { restaurant: restaurantId }
+                    $match: { restaurant: id }
                 },
                 {
                     $group: {
@@ -23,12 +23,12 @@ export type ReviewDocument = Review & mongoose.Document
             ])
         
             if( stats.length > 0 ){
-                await model.findByIdAndUpdate(restaurantId, {
+                await model.findByIdAndUpdate(id, {
                     ratingQuantity: stats[0].nRating,
                     ratingAverage: stats[0].avgRating
                 })
             }else{
-                await model.findByIdAndUpdate(restaurantId, {
+                await model.findByIdAndUpdate(id, {
                     ratingQuantity: 0,
                     ratingAverage: 4.5
                 })
@@ -53,8 +53,8 @@ export class Review {
 
 export const ReviewSchema = SchemaFactory.createForClass(Review)
 
-export interface RestaurantModel extends Model<Restaurant> {}
-export interface ReviewModel extends Model<Review> {
+export interface RestaurantModel extends Model<RestaurantDocument | Restaurant> {}
+export interface ReviewModel extends Model<ReviewDocument> {
     calcAvgRating:(
         restaeauntId: string,
         model?: RestaurantModel
