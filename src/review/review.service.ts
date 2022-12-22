@@ -1,5 +1,5 @@
 import { UserDocument } from './../user/schema/user.schema';
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Review, ReviewModel } from './schema/review.schema';
 import { Model } from 'mongoose';
@@ -22,12 +22,19 @@ export class ReviewService {
             throw new BadRequestException('Only One Review')
          }
 
-         await this.reviewModel.calcAvgRating(restaurantId, this.restaurantModel)
+         const restaurant = await this.restaurantModel.findById({ _id: restaurantId })
 
-         return this.reviewModel.create({
+         if(!restaurant) {
+            throw new NotFoundException('Restaurant Not Found')
+         }
+
+         const review = await  this.reviewModel.create({
             ...input,
-            restaurant: restaurantId,
+            restaurant: restaurant._id,
             user
          })
+         await this.reviewModel.calcAvgRating(this.restaurantModel, review.restaurant)
+
+         return review
     }
 }
