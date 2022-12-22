@@ -16,7 +16,7 @@ export class ReviewService {
     async createReview(input: CreateReviewDto, user: UserDocument['_id'], restaurantId: RestaurantDocument['_id']) {
         const checkReview = await this.reviewModel.find({user, restaurantId})
 
-         // 1) Check if the user make a review before on that product
+         // 1) Check if the user make a review before on that restaurant
 
          if(checkReview.length !== 0) {
             throw new BadRequestException('Only One Review')
