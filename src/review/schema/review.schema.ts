@@ -8,14 +8,14 @@ export type ReviewDocument = Review & mongoose.Document
 @Schema({ 
     timestamps: true,
     statics: {
-        async calcAvgRating(this: ReviewModel , model: RestaurantModel, id: string) {
+        async calcAvgRating(this: ReviewModel , model: RestaurantModel, id: RestaurantDocument['_id']) {
             const stats = await this.aggregate([
                 {
                     $match: { restaurant: id }
                 },
                 {
                     $group: {
-                        _id: '$restaruant',
+                        _id: '$restaurant',
                         nRating: { $sum: 1 },
                         avgRating: { $avg: '$rating' }
                     }
@@ -54,10 +54,10 @@ export class Review {
 export const ReviewSchema = SchemaFactory.createForClass(Review)
 
 export interface RestaurantModel extends Model<RestaurantDocument | Restaurant> {}
-export interface ReviewModel extends Model<ReviewDocument> {
+export interface ReviewModel extends Model<ReviewDocument | Review> {
     calcAvgRating:(
-        restaeauntId: string,
-        model?: RestaurantModel
+        model: RestaurantModel,
+        id: RestaurantDocument['_id']
     ) => Promise<ReviewDocument | undefined>
 }
 
