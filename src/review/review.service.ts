@@ -2,7 +2,7 @@ import { UserDocument } from './../user/schema/user.schema';
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Review, ReviewModel } from './schema/review.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model, isValidObjectId } from 'mongoose';
 import { Restaurant, RestaurantDocument } from 'src/restaurant/schema/restaurant.schema';
 import { CreateReviewDto } from './dto/create-review.dto';
 
@@ -36,5 +36,21 @@ export class ReviewService {
          await this.reviewModel.calcAvgRating(this.restaurantModel, review.restaurant)
 
          return review
+    }
+
+    async findReviewById(reviewId: string) {
+
+        const isValidId = mongoose.isValidObjectId(reviewId)
+        if(!isValidId) {
+            throw new BadRequestException('Wrong mongoose ID Error. Please, enter the correct ID')
+        }
+
+        const review = await this.reviewModel.findById({ _id: reviewId })
+
+        if(!review) {
+            throw new NotFoundException('Review Not Found')
+        }
+
+        return review
     }
 }
