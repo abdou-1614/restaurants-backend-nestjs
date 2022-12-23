@@ -5,6 +5,7 @@ import { Review, ReviewModel } from './schema/review.schema';
 import mongoose, { Model, isValidObjectId } from 'mongoose';
 import { Restaurant, RestaurantDocument } from 'src/restaurant/schema/restaurant.schema';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { FindReviewQueryDto } from './dto/find-review.dto';
 
 @Injectable()
 export class ReviewService {
@@ -48,6 +49,20 @@ export class ReviewService {
         const review = await this.reviewModel.findById({ _id: reviewId })
 
         if(!review) {
+            throw new NotFoundException('Review Not Found')
+        }
+
+        return review
+    }
+
+    async findAllReview(query: FindReviewQueryDto): Promise<Review[]> {
+        const page = query.page || 1
+        const limit = query.limit || 10
+        const skip = limit * ( page - 1 )
+
+        const review = await this.reviewModel.find().limit(limit).skip(skip)
+
+        if(review.length === 0) {
             throw new NotFoundException('Review Not Found')
         }
 
