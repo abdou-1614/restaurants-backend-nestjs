@@ -1,11 +1,12 @@
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { Request } from 'express';
 import { Public } from 'src/auth/public.decorator';
 import { FindReviewQueryDto } from './dto/find-review.dto';
 import { Review } from './schema/review.schema';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @ApiTags('Review')
 @Controller('review')
@@ -41,5 +42,17 @@ export class ReviewController {
   @Get()
   async findAll(@Query() query: FindReviewQueryDto): Promise<Review[]> {
     return this.reviewService.findAllReview(query)
+  }
+
+  @ApiOkResponse({
+    type: CreateReviewDto,
+    description: 'Review Updated Successfully.'
+  })
+  @ApiOperation({ summary: 'Update Review By User Creator' })
+  @ApiBearerAuth()
+  @Patch('update-review/:reviewId')
+  async update(@Param('reviewId') reviewId: string, @Body() input: UpdateReviewDto, @Req() request: Request) {
+    const { userId } = request.user as { userId: string }
+    return this.reviewService.updateReview(input, userId, reviewId)
   }
 }
