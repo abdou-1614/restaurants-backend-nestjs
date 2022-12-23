@@ -1,11 +1,12 @@
 import { UserDocument } from './../user/schema/user.schema';
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Review, ReviewModel } from './schema/review.schema';
+import { Review, ReviewDocument, ReviewModel } from './schema/review.schema';
 import mongoose, { Model, isValidObjectId } from 'mongoose';
 import { Restaurant, RestaurantDocument } from 'src/restaurant/schema/restaurant.schema';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { FindReviewQueryDto } from './dto/find-review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewService {
@@ -67,5 +68,26 @@ export class ReviewService {
         }
 
         return review
+    }
+
+    async updateReview(input: UpdateReviewDto, user: UserDocument['_id'], reviewId: string) {
+        const review = await this.reviewModel.findById(reviewId)
+
+        // 1) Check if review doesn't exist
+        if(!reviewId) {
+            throw new NotFoundException('Review Not Found')
+        }
+
+        // 2) Check if the one who want to update review is the review creator
+
+        if(review.user.toString() !== user.toString()) {
+            throw new BadRequestException('Not Review Creator')
+        }
+        // 3) Update review
+
+        return this.reviewModel.findByIdAndUpdate(reviewId, input, {
+            new: true,
+            runValidators: true
+        })
     }
 }
