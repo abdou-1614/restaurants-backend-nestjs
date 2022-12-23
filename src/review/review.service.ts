@@ -71,7 +71,11 @@ export class ReviewService {
     }
 
     async updateReview(input: UpdateReviewDto, user: UserDocument['_id'], reviewId: string) {
-        const review = await this.reviewModel.findById(reviewId)
+        const isValidId = mongoose.isValidObjectId(reviewId)
+        if(!isValidId) {
+            throw new BadRequestException('Wrong mongoose ID Error. Please, enter the correct ID')
+        }
+        const review = await this.reviewModel.findById({_id: reviewId})
 
         // 1) Check if review doesn't exist
         if(!reviewId) {
