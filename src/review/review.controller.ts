@@ -1,6 +1,6 @@
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Body, Controller, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { Request } from 'express';
 import { Public } from 'src/auth/public.decorator';
@@ -54,5 +54,16 @@ export class ReviewController {
   async update(@Param('reviewId') reviewId: string, @Body() input: UpdateReviewDto, @Req() request: Request) {
     const { userId } = request.user as { userId: string }
     return this.reviewService.updateReview(input, userId, reviewId)
+  }
+
+  @ApiOkResponse({
+    description: 'Review Deleted Successful',
+  })
+  @ApiOperation({ summary: 'Review Deleted By User Creator' })
+  @ApiBearerAuth()
+  @Delete('/:reviewId')
+  async delete(@Param('reviewId') reviewId: string, @Req() request: Request) {
+    const { userId } = request.user as { userId: string }
+    return this.reviewService.deleteReview(reviewId, userId)
   }
 }
