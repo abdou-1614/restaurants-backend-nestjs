@@ -94,4 +94,25 @@ export class ReviewService {
             runValidators: true
         })
     }
+
+    async deleteReview(reviewId: string, user: UserDocument['_id']) {
+        const isValidId = mongoose.isValidObjectId(reviewId)
+        if(!isValidId) {
+            throw new BadRequestException('Wrong mongoose ID Error. Please, enter the correct ID')
+        }
+
+        const review = await this.reviewModel.findById({ _id: reviewId })
+
+        if(!review) {
+            throw new NotFoundException('Review Not Found')
+        }
+
+        if(review.user.toString() !== user.toString()) {
+            throw new BadRequestException('Not Review Creator')
+        }
+
+        await this.reviewModel.findByIdAndDelete(reviewId)
+
+        return "Successful Review Delete"
+    }
 }
