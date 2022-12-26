@@ -1,7 +1,6 @@
 import { JwtSignOptions } from '@nestjs/jwt';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { PasswordResetDto } from './dto/password-reset.dto';
-import { NotFoundException } from '@nestjs/common/exceptions';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ChangeMyPasswordDto } from './dto/change-password.dto';
 import { InvalidRefreshTokenException } from './exceptions/invalid-refresh-token.exception';
@@ -9,7 +8,7 @@ import { RefreshTokenPayload } from './types/refresh-token-payload';
 import { compare } from 'bcrypt';
 import { RefreshTokenDocument } from './schema/token.schema';
 import { privateField, UserDocument } from './../user/schema/user.schema';
-import { Injectable, BadRequestException, Inject, HttpStatus } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, HttpStatus, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { ForgotPasswordDocument } from './schema/forgotPassword.schema';
@@ -208,6 +207,10 @@ export class AuthService {
 
             const user = await this.userModel.findOne({email, verified: true, isActive: true})
 
+            if(!user) {
+                throw new NotFoundException('User Not Found')
+            }
+
             await this.forgotPasswordModel.deleteMany({ user: user._id })
 
             await this.forgotPassword({ email })
@@ -234,7 +237,7 @@ export class AuthService {
 
 
         private async validateUser(email: string, password: string) {
-            const user = await this.userModel.findOne({ email, verified: true, isActive: true })
+            const user = await this.userModel.findOne({ email, isActive: true })
             if(!user) {
                 throw new HttpException('Invalid Email Or Password', HttpStatus.BAD_REQUEST)
             }
