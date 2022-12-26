@@ -87,6 +87,6 @@ export class MealService {
 
             await this.mealModel.findByIdAndDelete(id)
 
-            return 'Meal Deleted Succesfull'
+            return 'Successful Meal Delete'
         }
 }
