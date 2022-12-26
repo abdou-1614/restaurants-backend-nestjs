@@ -1,8 +1,8 @@
 import { VerifyForgotPasswordDto } from './dto/verify-forgot-password.dto';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags, ApiTooManyRequestsResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { Public } from './public.decorator';
 import { Request } from 'express';
@@ -13,6 +13,7 @@ import { UserDocument } from 'src/user/schema/user.schema';
 import { ChangeMyPasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { PasswordResetDto } from './dto/password-reset.dto';
+import { RateLimitInterceptor } from 'src/common/interceptors/rate-limit.interceptor';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -77,8 +78,10 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPassword)
   }
 
-  @ApiOperation({ summary: 'Resend Forgot Password OTP' })
+  @ApiTooManyRequestsResponse({ description: 'You Will Be Able To Wait For 1 Minute To Request New OTP'})
+  @ApiOperation({ summary: 'Resend Forgot Password OTP', description: 'NOTE: RATE_LIMIT, It Mean You Will Wait 1 Minute To Request New OTP' })
   @Public()
+  @UseInterceptors(new RateLimitInterceptor())
   @Post('/resend-forgot-password')
   async resendForgotPassword(@Body() ForgotPassword: ForgotPasswordDto) {
     return this.authService.resendForgetPassword(ForgotPassword)
