@@ -9,6 +9,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FindRestaurantQueryDto } from './dto/find-restaurant.dto';
 import { UpdateRestaurantDetailsDto } from './dto/update-restaurant.dto';
 import { UpdateImagesDto } from './dto/update-restaurant-images.dto';
+import { Cron, CronExpression } from '@nestjs/schedule/dist';
 
 @Injectable()
 export class RestaurantService {
@@ -153,6 +154,7 @@ export class RestaurantService {
         return 'Restaurant Deleted Successful'
     }
 
+    @Cron(CronExpression.EVERY_12_HOURS)
     async findTopRatingRestaurant() {
         return await this.restaurantModel.find().sort({ 'ratingAverage': -1 }).limit(5)
     }
