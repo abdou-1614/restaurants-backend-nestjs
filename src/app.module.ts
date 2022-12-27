@@ -8,6 +8,7 @@ import { AccessJwtGuard } from './auth/auth-jwt.guard';
 import { RestaurantModule } from './restaurant/restaurant.module';
 import { MealModule } from './meal/meal.module';
 import { ReviewModule } from './review/review.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 @Module({
@@ -16,6 +17,7 @@ import { ReviewModule } from './review/review.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.DB_URI),
+    ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
     RestaurantModule,
