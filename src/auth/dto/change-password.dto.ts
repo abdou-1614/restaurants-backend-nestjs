@@ -13,7 +13,7 @@ export class ChangeMyPasswordDto {
     old_password: string
 
     @ApiProperty({
-        example: 'oldPassword',
+        example: 'newPassword',
         format: 'string'
     })
     @IsNotEmpty()
